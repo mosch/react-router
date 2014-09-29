@@ -2,8 +2,8 @@ var canUseDOM = require('react/lib/ExecutionEnvironment').canUseDOM;
 var HashLocation = require('../locations/HashLocation');
 var HistoryLocation = require('../locations/HistoryLocation');
 var RefreshLocation = require('../locations/RefreshLocation');
-var PathStore = require('../stores/PathStore');
 var supportsHistory = require('../utils/supportsHistory');
+var PathStore = require('../stores/PathStore');
 
 /**
  * A hash of { name: location } pairs.
@@ -16,13 +16,12 @@ var NAMED_LOCATIONS = {
 
 /**
  * A mixin for components that need to know the current URL path. Components
- * that use it may specify a `location` prop that they use to track changes
- * to the URL. They also get:
+ * that use it get two things:
  *
- *   1. An `updatePath` method that is called when the
+ *   1. An optional `location` prop that they use to track
+ *      changes to the URL
+ *   2. An `updatePath` method that is called when the
  *      current URL path changes
- *   2. A `getCurrentPath` method they can use to get
- *      the current URL path
  *
  * Example:
  *
@@ -30,15 +29,9 @@ var NAMED_LOCATIONS = {
  *     
  *     mixins: [ Router.PathState ],
  *   
- *     getInitialState: function () {
- *       return {
- *         currentPath: this.getCurrentPath()
- *       };
- *     },
- *   
- *     updatePath: function () {
+ *     updatePath: function (path, sender) {
  *       this.setState({
- *         currentPath: this.getCurrentPath()
+ *         currentPath: path
  *       });
  *     }
  *   
@@ -60,7 +53,7 @@ var PathState = {
   getDefaultProps: function () {
     return {
       location: canUseDOM ? HashLocation : null,
-      path: null
+      initialPath: null
     };
   },
 
@@ -88,7 +81,7 @@ var PathState = {
       location.setup();
 
     if (this.updatePath)
-      this.updatePath(this.getCurrentPath(), this);
+      this.updatePath(this.props.initialPath || PathStore.getCurrentPath(), this);
   },
 
   componentDidMount: function () {
@@ -101,14 +94,7 @@ var PathState = {
 
   handlePathChange: function (sender) {
     if (this.isMounted() && this.updatePath)
-      this.updatePath(this.getCurrentPath(), sender);
-  },
-
-  /**
-   * Returns the current URL path.
-   */
-  getCurrentPath: function () {
-    return PathStore.getCurrentPath();
+      this.updatePath(PathStore.getCurrentPath(), sender);
   }
 
 };
