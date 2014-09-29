@@ -70,9 +70,9 @@ var PathDelegate = {
 
     // If we have a location, route the transition through it.
     if (location) {
-      location.push(path, this);
+      location.push(path, sender);
     } else if (this.updatePath) {
-      this.updatePath(path, this);
+      this.updatePath(path, sender);
     }
   },
 

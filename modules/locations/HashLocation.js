@@ -5,8 +5,10 @@ var LocationDispatcher = require('../dispatchers/LocationDispatcher');
 var getWindowPath = require('../utils/getWindowPath');
 
 function getHashPath() {
-  return window.location.hash.substr(1) || '/';
+  return window.location.hash.substr(1);
 }
+
+var _actionType, _actionSender;
 
 function ensureSlash() {
   var path = getHashPath();
@@ -18,8 +20,6 @@ function ensureSlash() {
 
   return false;
 }
-
-var _actionType, _actionSender;
 
 function onHashChange() {
   if (ensureSlash()) {
@@ -55,11 +55,8 @@ var HashLocation = {
       window.attachEvent('onhashchange', onHashChange);
     }
 
-    LocationDispatcher.handleViewAction({
-      type: LocationActions.SETUP,
-      path: getHashPath(),
-      sender: window
-    });
+    _actionType = LocationActions.SETUP;
+    ensureSlash();
 
     _isSetup = true;
   },
